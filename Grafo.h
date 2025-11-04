@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <queue>
+#include <cmath>
 using namespace std;
 
 /**
@@ -15,16 +16,17 @@ class Grafo {
 private:
     int numVertices;                      // Número de vértices
     bool esDirigido;                      // True = dirigido, False = no dirigido
-    vector<vector<int>> matrizAdyacencia; // Matriz NxN
+    vector<vector<double>> matrizAdyacencia; // Matriz NxN
     void DFSRecursivo(int v, vector<bool>& visitado); // Auxiliar para DFS
 
 public:
     // Constructor
-    Grafo(int numVertices, bool esDirigido = false);
+    Grafo(int numVertices, bool esDirigido);
 
     // Métodos básicos
-    void agregarArista(int origen, int destino);
-    void eliminarArista(int origen, int destino);
+    vector<pair<double, double>> coordenadas; // (x,y) de cada vértice
+    void agregarArista(double x, double y);
+    void calcularMatrizDistancias(); //Genera todas las aristas (Grafo completo)
     void mostrarMatriz() const;
 
     // Recorridos

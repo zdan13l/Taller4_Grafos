@@ -4,57 +4,59 @@
 Grafo::Grafo(int numVertices, bool esDirigido) {
     this->numVertices = numVertices;
     this->esDirigido = esDirigido;
-    matrizAdyacencia = vector<vector<int>>(numVertices, vector<int>(numVertices, 0));
+    matrizAdyacencia = vector<vector<double>>(numVertices, vector<double>(numVertices, 0));
 }
 
-// Agregar una arista
-void Grafo::agregarArista(int origen, int destino) {
-    if (origen < 0 || origen >= numVertices || destino < 0 || destino >= numVertices) {
-        cout << "Error: índice de vértice fuera de rango." << endl;
-        return;
-    }
-
-    matrizAdyacencia[origen][destino] = 1;
-
-    // Si es no dirigido, marcamos también la conexión inversa
-    if (!esDirigido)
-        matrizAdyacencia[destino][origen] = 1;
+// Agregar coordenada
+void Grafo::agregarArista(double x, double y) {
+    coordenadas.push_back({x, y});
 }
 
-// Eliminar una arista
-void Grafo::eliminarArista(int origen, int destino) {
-    if (origen < 0 || origen >= numVertices || destino < 0 || destino >= numVertices) {
-        cout << "Error: índice de vértice fuera de rango." << endl;
-        return;
-    }
-
-    matrizAdyacencia[origen][destino] = 0;
-
-    // Si no es dirigido, eliminar también la inversa
-    if (!esDirigido)
-        matrizAdyacencia[destino][origen] = 0;
-}
-
-// Mostrar la matriz de adyacencia
-void Grafo::mostrarMatriz() const {
-    cout << (esDirigido ? "Grafo Dirigido" : "Grafo No Dirigido") << endl;
-    cout << "Matriz de Adyacencia:" << endl;
-
+// Calcular distancias (genera el grafo completo)
+void Grafo::calcularMatrizDistancias() {
     for (int i = 0; i < numVertices; i++) {
         for (int j = 0; j < numVertices; j++) {
-            cout << matrizAdyacencia[i][j] << " ";
+            if (i != j) {
+                double dx = coordenadas[i].first - coordenadas[j].first;
+                double dy = coordenadas[i].second - coordenadas[j].second;
+                double dist = sqrt(dx * dx + dy * dy);
+                matrizAdyacencia[i][j] = dist;
+                if (!esDirigido)
+                    matrizAdyacencia[j][i] = dist;
+            }
+        }
+    }
+}
+
+void Grafo::mostrarMatriz() const {
+    if (esDirigido) {
+    cout << "Grafo Dirigido" << endl;
+    } else {
+    cout << "Grafo No Dirigido" << endl;
+    }
+    cout << "Matriz de Adyacencia (distancias):" << endl;
+
+    // Mostrar encabezado de columnas
+    cout << "\t";
+    for (int j = 0; j < numVertices; j++) {
+        cout << "(" << coordenadas[j].first << ", " << coordenadas[j].second << ")\t";
+    }
+    cout << endl;
+
+    // Mostrar filas con coordenadas
+    for (int i = 0; i < numVertices; i++) {
+        cout << "(" << coordenadas[i].first << ", " << coordenadas[i].second << ")\t";
+        for (int j = 0; j < numVertices; j++) {
+            cout << matrizAdyacencia[i][j] << "\t";
         }
         cout << endl;
     }
 }
 
-// Recorrido BFS
-void Grafo::BFS(int verticeInicio) const {
-    if (verticeInicio < 0 || verticeInicio >= numVertices) {
-        cout << "Error: vértice de inicio fuera de rango." << endl;
-        return;
-    }
 
+
+// BFS y DFS (idénticos, usan matriz > 0 como conexión)
+void Grafo::BFS(int verticeInicio) const {
     vector<bool> visitado(numVertices, false);
     queue<int> cola;
 
@@ -62,14 +64,13 @@ void Grafo::BFS(int verticeInicio) const {
     cola.push(verticeInicio);
 
     cout << "Recorrido BFS: ";
-
     while (!cola.empty()) {
         int v = cola.front();
         cola.pop();
         cout << v << " ";
 
         for (int i = 0; i < numVertices; i++) {
-            if (matrizAdyacencia[v][i] == 1 && !visitado[i]) {
+            if (matrizAdyacencia[v][i] > 0 && !visitado[i]) {
                 visitado[i] = true;
                 cola.push(i);
             }
@@ -78,27 +79,20 @@ void Grafo::BFS(int verticeInicio) const {
     cout << endl;
 }
 
-// Recorrido DFS (público)
 void Grafo::DFS(int verticeInicio) const {
-    if (verticeInicio < 0 || verticeInicio >= numVertices) {
-        cout << "Error: vértice de inicio fuera de rango." << endl;
-        return;
-    }
-
     vector<bool> visitado(numVertices, false);
     cout << "Recorrido DFS: ";
     const_cast<Grafo*>(this)->DFSRecursivo(verticeInicio, visitado);
     cout << endl;
 }
 
-// DFS recursivo (privado)
 void Grafo::DFSRecursivo(int v, vector<bool>& visitado) {
     visitado[v] = true;
     cout << v << " ";
 
     for (int i = 0; i < numVertices; i++) {
-        if (matrizAdyacencia[v][i] == 1 && !visitado[i]) {
+        if (matrizAdyacencia[v][i] > 0 && !visitado[i])
             DFSRecursivo(i, visitado);
-        }
     }
 }
+
