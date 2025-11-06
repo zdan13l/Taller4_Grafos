@@ -1,98 +1,89 @@
 #include "Grafo.h"
 
-// Constructor
-Grafo::Grafo(int numVertices, bool esDirigido) {
-    this->numVertices = numVertices;
-    this->esDirigido = esDirigido;
-    matrizAdyacencia = vector<vector<double>>(numVertices, vector<double>(numVertices, 0));
+Grafo::Grafo() {
+    vertices.clear();
+    matrizAdyacencia.clear();
 }
 
-// Agregar coordenada
-void Grafo::agregarArista(double x, double y) {
-    coordenadas.push_back({x, y});
+double Grafo::calcularDistancia(const Vertice& a, const Vertice& b) const {
+    int dx = abs(a.getX() - b.getX());
+    int dy = abs(a.getY() - b.getY());
+
+    if (dy == 0) return dx;      // misma fila
+    else if (dx == 0) return dy; // misma columna
+    else return sqrt(dx*dx + dy*dy); // diagonal
 }
 
-// Calcular distancias (genera el grafo completo)
-void Grafo::calcularMatrizDistancias() {
-    for (int i = 0; i < numVertices; i++) {
-        for (int j = 0; j < numVertices; j++) {
-            if (i != j) {
-                double dx = coordenadas[i].first - coordenadas[j].first;
-                double dy = coordenadas[i].second - coordenadas[j].second;
-                double dist = sqrt(dx * dx + dy * dy);
-                matrizAdyacencia[i][j] = dist;
-                if (!esDirigido)
-                    matrizAdyacencia[j][i] = dist;
-            }
+// Método normal para agregar productos
+void Grafo::agregarVertice(int x, int y) {
+    int id = vertices.size();
+    Vertice v(id, x, y);
+    vertices.push_back(v);
+
+    // Agregar nueva fila a la matriz
+    vector<double> nuevaFila(vertices.size(), 0.0);
+    matrizAdyacencia.push_back(nuevaFila);
+
+    // Calcular distancias con todos los anteriores
+    for (vector<Vertice>::iterator it = vertices.begin(); it != vertices.end(); ++it) {
+        int i = it->getId();
+        int j = id;
+        if (i != j) {
+            double d = calcularDistancia(*it, v);
+            matrizAdyacencia[i][j] = d;
+            matrizAdyacencia[j][i] = d;
         }
     }
 }
 
-void Grafo::mostrarMatriz() const {
-    if (esDirigido) {
-    cout << "Grafo Dirigido" << endl;
-    } else {
-    cout << "Grafo No Dirigido" << endl;
-    }
-    cout << "Matriz de Adyacencia (distancias):" << endl;
+// Agregar el origen siempre al inicio
+void Grafo::agregarOrigen() {
+    Vertice origen(0, 0, 0); // id=0, x=0, y=0
+    vertices.insert(vertices.begin(), origen);
 
-    // Mostrar encabezado de columnas
-    cout << "\t";
-    for (int j = 0; j < numVertices; j++) {
-        cout << "(" << coordenadas[j].first << ", " << coordenadas[j].second << ")\t";
-    }
-    cout << endl;
+    // Crear nueva matriz de adyacencia
+    int n = vertices.size();
+    vector<vector<double>> nuevaMatriz(n, vector<double>(n, 0.0));
 
-    // Mostrar filas con coordenadas
-    for (int i = 0; i < numVertices; i++) {
-        cout << "(" << coordenadas[i].first << ", " << coordenadas[i].second << ")\t";
-        for (int j = 0; j < numVertices; j++) {
-            cout << matrizAdyacencia[i][j] << "\t";
+    // Copiar distancias existentes y calcular las nuevas
+    for (int i = 1; i < n; ++i) {
+        double d = calcularDistancia(vertices[0], vertices[i]);
+        nuevaMatriz[0][i] = d;
+        nuevaMatriz[i][0] = d;
+    }
+
+    // Copiar distancias antiguas a la nueva matriz (desplazadas 1)
+    for (int i = 1; i < n; ++i) {
+        for (int j = 1; j < n; ++j) {
+            nuevaMatriz[i][j] = matrizAdyacencia[i-1][j-1];
+        }
+    }
+
+    matrizAdyacencia = nuevaMatriz;
+
+    // Reasignar IDs a los vértices
+    for (int i = 0; i < n; ++i) {
+        vertices[i] = Vertice(i, vertices[i].getX(), vertices[i].getY());
+    }
+}
+
+int Grafo::getCantidadVertices() const {
+    return vertices.size();
+}
+
+const Vertice& Grafo::getVertice(int indice) const {
+    return vertices[indice];
+}
+
+const vector<vector<double>>& Grafo::getMatrizAdyacencia() const {
+    return matrizAdyacencia;
+}
+
+void Grafo::imprimirMatriz() const {
+    for (vector<vector<double>>::const_iterator itFila = matrizAdyacencia.begin(); itFila != matrizAdyacencia.end(); ++itFila) {
+        for (vector<double>::const_iterator itCol = itFila->begin(); itCol != itFila->end(); ++itCol) {
+            cout << *itCol << "\t";
         }
         cout << endl;
     }
 }
-
-
-
-// BFS y DFS (idénticos, usan matriz > 0 como conexión)
-void Grafo::BFS(int verticeInicio) const {
-    vector<bool> visitado(numVertices, false);
-    queue<int> cola;
-
-    visitado[verticeInicio] = true;
-    cola.push(verticeInicio);
-
-    cout << "Recorrido BFS: ";
-    while (!cola.empty()) {
-        int v = cola.front();
-        cola.pop();
-        cout << v << " ";
-
-        for (int i = 0; i < numVertices; i++) {
-            if (matrizAdyacencia[v][i] > 0 && !visitado[i]) {
-                visitado[i] = true;
-                cola.push(i);
-            }
-        }
-    }
-    cout << endl;
-}
-
-void Grafo::DFS(int verticeInicio) const {
-    vector<bool> visitado(numVertices, false);
-    cout << "Recorrido DFS: ";
-    const_cast<Grafo*>(this)->DFSRecursivo(verticeInicio, visitado);
-    cout << endl;
-}
-
-void Grafo::DFSRecursivo(int v, vector<bool>& visitado) {
-    visitado[v] = true;
-    cout << v << " ";
-
-    for (int i = 0; i < numVertices; i++) {
-        if (matrizAdyacencia[v][i] > 0 && !visitado[i])
-            DFSRecursivo(i, visitado);
-    }
-}
-

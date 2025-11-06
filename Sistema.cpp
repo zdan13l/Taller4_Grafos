@@ -1,74 +1,142 @@
 #include "Sistema.h"
+#include <fstream>
+#include <iostream>
+#include <iomanip>
 
 Sistema::Sistema() {
-    grafo = nullptr;
-    capacidad = 0;
-    cantidadProductos = 0;
-    escenarios = 0;
+    escenarios.clear();
+    robots.clear();
+    recorridos.clear();
 }
 
-Sistema::~Sistema() {
-    delete grafo;
-}
-
-// Lee el archivo de entrada
-bool Sistema::cargarArchivo(const string& nombreArchivo) {
-    ifstream archivo(nombreArchivo);
+void Sistema::cargarArchivo(const string& nombreArchivo) {
+    ifstream archivo(nombreArchivo.c_str());
     if (!archivo.is_open()) {
-        cout << " Error: No se pudo abrir el archivo." << endl;
-        return false;
+        cout << "Error al abrir el archivo." << endl;
+        return;
     }
 
-    archivo >> escenarios;          // n: cantidad de escenarios
-    archivo >> capacidad;           // k: capacidad máxima
-    archivo >> cantidadProductos;   // m: número de productos
+    escenarios.clear();
+    robots.clear();
+    recorridos.clear();
 
-    cout << "\nArchivo cargado correctamente." << endl;
-    cout << "Escenarios(n): " << escenarios << endl;
-    cout << "Capacidad(k): " << capacidad << endl;
-    cout << "Productos(m): " << cantidadProductos << endl;
+    int n; // número de escenarios
+    archivo >> n;
 
-    // Crea el grafo (productos + base)
-    int totalVertices = cantidadProductos + 1; // +1 de la base (robot)
-    grafo = new Grafo(totalVertices, false);
-
-    // Agrega coordenada base (0,0)
-    grafo->agregarArista(0, 0);
-
-    // Leer coordenadas de productos
-    double x, y;
-    for (int i = 0; i < cantidadProductos; i++) {
-        if (!(archivo >> x >> y)) {
-            cout << " Error al leer coordenadas del archivo." << endl;
-            return false;
+    for (int e = 0; e < n; ++e) {
+        int capacidad, m;
+        if (!(archivo >> capacidad >> m)) {
+            cout << "Error: formato incorrecto en archivo." << endl;
+            return;
         }
-        grafo->agregarArista(x, y);
+
+        Grafo grafo;
+        grafo.agregarOrigen(); // origen siempre al inicio
+
+        for (int i = 0; i < m; ++i) {
+            int x, y;
+            if (!(archivo >> x >> y)) {
+                cout << "Error: datos incompletos en el archivo." << endl;
+                return;
+            }
+            grafo.agregarVertice(x, y);
+        }
+
+        escenarios.push_back(grafo);
+        robots.emplace_back(capacidad, escenarios.back()); // referencia al grafo
     }
 
     archivo.close();
 
-    // Calcular matriz de distancias
-    grafo->calcularMatrizDistancias();
-
-    // Mostrar las coordenadas cargadas correctamente
-    cout << "\nCoordenadas cargadas (incluyendo base):" << endl;
-    for (int i = 0; i < cantidadProductos + 1; i++) {
-        cout << "Vértice " << i << ": (" 
-        << grafo->coordenadas[i].first << ", " 
-        << grafo->coordenadas[i].second << ")" << endl;
+    // Procesar recorridos
+    for (size_t i = 0; i < escenarios.size(); ++i) {
+        robots[i].recorrer();
+        recorridos.push_back(robots[i].getRecorrido());
     }
 
-    return true;
-}
+    // Imprimir en consola
+    imprimirRecorridos();
 
-void Sistema::mostrarResumen() const {
-    if (!grafo) {
-        cout << " No hay un grafo cargado." << endl;
+    // Guardar archivo de salida
+    string nombreSalida = "salida_" + nombreArchivo;
+    ofstream archivoSalida(nombreSalida.c_str());
+    if (!archivoSalida.is_open()) {
+        cout << "Error al crear el archivo de salida." << endl;
         return;
     }
 
-    cout << "\n    ~~~~ Datos obtenidos ~~~~   " << endl;
-    cout << "Capacidad del robot (k): " << capacidad << endl;
-    cout << "Número de productos (m): " << cantidadProductos << endl;
-    grafo->mostrarMatriz();
+    archivoSalida << recorridos.size() << endl;
+
+    for (size_t i = 0; i < recorridos.size(); ++i) {
+        archivoSalida << robots[i].getCapacidad() << endl;
+        archivoSalida << recorridos[i].size() << endl;
+        for (size_t j = 0; j < recorridos[i].size(); ++j) {
+            int id = recorridos[i][j];
+            const Vertice& v = escenarios[i].getVertice(id);
+            archivoSalida << v.getX() << " " << v.getY() << endl;
+        }
+    }
+
+    archivoSalida.close();
+    cout << "Archivo de salida guardado como: " << nombreSalida << endl;
+}
+
+// Imprime los recorridos en consola
+void Sistema::imprimirRecorridos() const {
+    for (size_t i = 0; i < recorridos.size(); ++i) {
+        cout << "Escenario " << i + 1 << ": ";
+        for (size_t j = 0; j < recorridos[i].size(); ++j) {
+            cout << recorridos[i][j];
+            if (j != recorridos[i].size() - 1) cout << " -> ";
+        }
+        cout << endl;
+    }
+}
+
+// Mostrar tablero con emojis
+void Sistema::mostrarTablero(int escenarioIndex) const {
+    if (escenarioIndex < 0 || escenarioIndex >= (int)escenarios.size()) {
+        cout << "Escenario inválido." << endl;
+        return;
+    }
+
+    const Grafo& grafo = escenarios[escenarioIndex];
+    const vector<int>& recorrido = robots[escenarioIndex].getRecorrido();
+
+    // Definir emojis como strings
+    const string ROBOT = "\xF0\x9F\xA4\x96"; // 🤖
+    const string CAJA  = "\xF0\x9F\x93\xA6"; // 📦
+    
+
+    // Escala para mostrar en consola
+    const int ESCALA = 2;
+    const int TAM_TABLERO = 100 / ESCALA + 1;
+
+    // Crear tablero vacío
+    vector<vector<string>> tablero(TAM_TABLERO, vector<string>(TAM_TABLERO, "·"));
+
+    // Colocar productos en el tablero
+    for (int i = 1; i < grafo.getCantidadVertices(); ++i) { // omitir origen
+        int x = grafo.getVertice(i).getX() / ESCALA;
+        int y = grafo.getVertice(i).getY() / ESCALA;
+        if (x >= TAM_TABLERO) x = TAM_TABLERO - 1;
+        if (y >= TAM_TABLERO) y = TAM_TABLERO - 1;
+        tablero[y][x] = CAJA;
+    }
+
+    // Colocar robot en la posición final del recorrido
+    int idRobot = recorrido.back();
+    int rx = grafo.getVertice(idRobot).getX() / ESCALA;
+    int ry = grafo.getVertice(idRobot).getY() / ESCALA;
+    if (rx >= TAM_TABLERO) rx = TAM_TABLERO - 1;
+    if (ry >= TAM_TABLERO) ry = TAM_TABLERO - 1;
+    tablero[ry][rx] = ROBOT;
+
+    // Imprimir tablero invertido para que y=0 quede abajo
+    for (int y = TAM_TABLERO - 1; y >= 0; --y) {
+        for (int x = 0; x < TAM_TABLERO; ++x) {
+            cout << tablero[y][x] << " ";
+        }
+        cout << endl;
+    }
 }

@@ -1,24 +1,30 @@
-#include "Grafo.h"
+#include <iostream>
 #include "Sistema.h"
 
+using namespace std;
+
 int main() {
-    cout << endl;
-    cout << "       ˙✦˙✦˙✦˙✦   TALLER 4  ˙✦˙✦˙✦˙✦" << endl;
-    cout << "        Joselito recolector de basura" << endl;
-    cout << "      ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦" << endl;
+    char opcion;
 
-    Sistema sistema;
-    string nombreArchivo;
+    do {
+        // Encabezado bonito
+        cout << endl;
+        cout << "       ˙✦˙✦˙✦˙✦   TALLER 4  ˙✦˙✦˙✦˙✦" << endl;
+        cout << "        Joselito recolector de basura" << endl;
+        cout << "      ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦" << endl << endl;
 
-    cout << endl << "~~~~~~ Sistema de recolección con Grafs ~~~~~~   " << endl;
-    cout << "Ingrese el nombre del archivo a cargar: ";
-    cin >> nombreArchivo;
+        string nombreArchivo;
+        cout << "Ingrese el nombre del archivo de entrada: ";
+        cin >> nombreArchivo;
 
-    if (sistema.cargarArchivo(nombreArchivo)) {
-        sistema.mostrarResumen();
-    } else {
-        cout << "No se pudo cargar el archivo. Verifique el nombre o formato." << endl;
-    }
+        // Crear Sistema y ejecutar
+        Sistema sistema;
+        sistema.cargarArchivo(nombreArchivo); // Este método leerá, procesará y guardará
+
+        cout << "¿Desea procesar otro archivo? (s/n): ";
+        cin >> opcion;
+
+    } while (opcion == 's' || opcion == 'S');
 
     return 0;
 }
