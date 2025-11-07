@@ -1,7 +1,7 @@
 #include "Robot.h"
 
-Robot::Robot(int capacidad, const Grafo& g)
-    : capacidadMaxima(capacidad), grafo(g), visitado(g.getCantidadVertices(), false) {}
+Robot::Robot(int capacidad, const Grafo& grafo)
+    : capacidadMaxima(capacidad), grafo(grafo), visitado(grafo.getCantidadVertices(), false) {}
 
 
 
@@ -59,6 +59,6 @@ const vector<int>& Robot::getRecorrido() const {
     return recorrido;
 }
 
-int Robot::getCapacidad(){
+int Robot::getCapacidad() const {
     return capacidadMaxima;
 }

@@ -1,29 +1,36 @@
-#include "Sistema.h"
+#include "Bodega.h"
+
 #include <fstream>
 #include <iostream>
 #include <iomanip>
 
-Sistema::Sistema() {
+// Constructor.
+Bodega::Bodega() {
     escenarios.clear();
     robots.clear();
     recorridos.clear();
 }
 
-void Sistema::cargarArchivo(const string& nombreArchivo) {
-    ifstream archivo(nombreArchivo.c_str());
+// Cargar archivo, procesar y guardar resultados.
+void Bodega::cargarArchivo(const string& nombreArchivo) {
+    // Abrir archivo de entrada.
+    ifstream archivo(nombreArchivo);
     if (!archivo.is_open()) {
-        cout << "Error al abrir el archivo." << endl;
+        cout << " Error... No se pudo abrir el archivo." << endl;
         return;
     }
 
+    // Limpiar datos previos.
     escenarios.clear();
     robots.clear();
     recorridos.clear();
 
-    int n; // número de escenarios
-    archivo >> n;
+    // n: Cantidad de escenarios.
+    int nEscenarios;
+    archivo >> nEscenarios;
 
-    for (int e = 0; e < n; ++e) {
+    // Leer parámetros iniciales.
+    for (int e = 0; e < nEscenarios; ++e) {
         int capacidad, m;
         if (!(archivo >> capacidad >> m)) {
             cout << "Error: formato incorrecto en archivo." << endl;
@@ -81,20 +88,22 @@ void Sistema::cargarArchivo(const string& nombreArchivo) {
     cout << "Archivo de salida guardado como: " << nombreSalida << endl;
 }
 
-// Imprime los recorridos en consola
-void Sistema::imprimirRecorridos() const {
-    for (size_t i = 0; i < recorridos.size(); ++i) {
+// Imprime los recorridos en consola.
+void Bodega::imprimirRecorridos() {
+    for (size_t i = 0; i < recorridos.size(); i++) {
         cout << "Escenario " << i + 1 << ": ";
-        for (size_t j = 0; j < recorridos[i].size(); ++j) {
+        for (size_t j = 0; j < recorridos[i].size(); j++) {
             cout << recorridos[i][j];
-            if (j != recorridos[i].size() - 1) cout << " -> ";
+            if (j != recorridos[i].size() - 1) {
+                cout << " -> ";
+            }
         }
         cout << endl;
     }
 }
 
 // Mostrar tablero con emojis
-void Sistema::mostrarTablero(int escenarioIndex) const {
+void Bodega::mostrarTablero(int escenarioIndex) const {
     if (escenarioIndex < 0 || escenarioIndex >= (int)escenarios.size()) {
         cout << "Escenario inválido." << endl;
         return;

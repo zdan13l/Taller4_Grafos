@@ -3,11 +3,14 @@
 Grafo::Grafo() {
     vertices.clear();
     matrizAdyacencia.clear();
+    cout << "[DEBUG] Grafo inicializado, listas limpiadas." << endl;
 }
 
 double Grafo::calcularDistancia(const Vertice& a, const Vertice& b) const {
     int dx = abs(a.getX() - b.getX());
     int dy = abs(a.getY() - b.getY());
+
+    cout << "[DEBUG] Calculando distancia entre vértices " << a.getId() << " y " << b.getId() << ": dx=" << dx << ", dy=" << dy << endl;
 
     if (dy == 0) return dx;      // misma fila
     else if (dx == 0) return dy; // misma columna
@@ -19,6 +22,7 @@ void Grafo::agregarVertice(int x, int y) {
     int id = vertices.size();
     Vertice v(id, x, y);
     vertices.push_back(v);
+    cout << "[DEBUG] Vertice agregado: ID=" << id << ", x=" << x << ", y=" << y << endl;
 
     // Agregar nueva fila a la matriz
     vector<double> nuevaFila(vertices.size(), 0.0);
@@ -32,6 +36,7 @@ void Grafo::agregarVertice(int x, int y) {
             double d = calcularDistancia(*it, v);
             matrizAdyacencia[i][j] = d;
             matrizAdyacencia[j][i] = d;
+            cout << "[DEBUG] Distancia entre " << i << " y " << j << " = " << d << endl;
         }
     }
 }
@@ -40,6 +45,7 @@ void Grafo::agregarVertice(int x, int y) {
 void Grafo::agregarOrigen() {
     Vertice origen(0, 0, 0); // id=0, x=0, y=0
     vertices.insert(vertices.begin(), origen);
+    cout << "[DEBUG] Origen agregado al inicio." << endl;
 
     // Crear nueva matriz de adyacencia
     int n = vertices.size();
@@ -50,6 +56,7 @@ void Grafo::agregarOrigen() {
         double d = calcularDistancia(vertices[0], vertices[i]);
         nuevaMatriz[0][i] = d;
         nuevaMatriz[i][0] = d;
+        cout << "[DEBUG] Distancia del origen a " << i << " = " << d << endl;
     }
 
     // Copiar distancias antiguas a la nueva matriz (desplazadas 1)
@@ -64,22 +71,27 @@ void Grafo::agregarOrigen() {
     // Reasignar IDs a los vértices
     for (int i = 0; i < n; ++i) {
         vertices[i] = Vertice(i, vertices[i].getX(), vertices[i].getY());
+        cout << "[DEBUG] ID reasignado: nuevo ID=" << i << endl;
     }
 }
 
 int Grafo::getCantidadVertices() const {
+    cout << "[DEBUG] Cantidad de vértices: " << vertices.size() << endl;
     return vertices.size();
 }
 
 const Vertice& Grafo::getVertice(int indice) const {
+    cout << "[DEBUG] Accediendo al vértice con índice: " << indice << endl;
     return vertices[indice];
 }
 
 const vector<vector<double>>& Grafo::getMatrizAdyacencia() const {
+    cout << "[DEBUG] Accediendo a la matriz de adyacencia." << endl;
     return matrizAdyacencia;
 }
 
 void Grafo::imprimirMatriz() const {
+    cout << "[DEBUG] Imprimiendo matriz de adyacencia:" << endl;
     for (vector<vector<double>>::const_iterator itFila = matrizAdyacencia.begin(); itFila != matrizAdyacencia.end(); ++itFila) {
         for (vector<double>::const_iterator itCol = itFila->begin(); itCol != itFila->end(); ++itCol) {
             cout << *itCol << "\t";

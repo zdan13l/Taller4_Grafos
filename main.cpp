@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Sistema.h"
+#include "Bodega.h"
 
 using namespace std;
 
@@ -7,21 +7,20 @@ int main() {
     char opcion;
 
     do {
-        // Encabezado bonito
         cout << endl;
-        cout << "       ˙✦˙✦˙✦˙✦   TALLER 4  ˙✦˙✦˙✦˙✦" << endl;
-        cout << "        Joselito recolector de basura" << endl;
-        cout << "      ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦" << endl << endl;
+        cout << "     ˙✦˙✦˙✦˙✦˙✦   TALLER 4  ✦˙✦˙✦˙✦˙✦˙" << endl;
+        cout << "         Joselito recolector de basura" << endl;
+        cout << "     ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙" << endl;
 
         string nombreArchivo;
-        cout << "Ingrese el nombre del archivo de entrada: ";
+        cout << endl << "~~~~~~ Sistema de recolección con Grafos ~~~~~~" << endl;
+        cout << " - Ingrese el nombre del archivo a cargar: ";
         cin >> nombreArchivo;
 
-        // Crear Sistema y ejecutar
-        Sistema sistema;
-        sistema.cargarArchivo(nombreArchivo); // Este método leerá, procesará y guardará
+        Bodega bodega;
+        bodega.cargarArchivo(nombreArchivo);
 
-        cout << "¿Desea procesar otro archivo? (s/n): ";
+        cout << " - ¿Desea procesar otro archivo? (S/N): ";
         cin >> opcion;
 
     } while (opcion == 's' || opcion == 'S');
