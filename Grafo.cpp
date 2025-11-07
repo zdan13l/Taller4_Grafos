@@ -1,49 +1,55 @@
 #include "Grafo.h"
+#include <iomanip>
 
-// Constructor
+// Constructor.
 Grafo::Grafo(int numVertices, bool esDirigido) {
     this->numVertices = numVertices;
     this->esDirigido = esDirigido;
     matrizAdyacencia = vector<vector<double>>(numVertices, vector<double>(numVertices, 0));
 }
 
-// Agregar coordenada
-void Grafo::agregarArista(double x, double y) {
+// Agregar coordenada.
+void Grafo::agregarVertice(double x, double y) {
     coordenadas.push_back({x, y});
 }
 
-// Calcular distancias (genera el grafo completo)
+// Calcular distancias (genera el grafo completo).
 void Grafo::calcularMatrizDistancias() {
+    double dx, dy, distancia;
     for (int i = 0; i < numVertices; i++) {
         for (int j = 0; j < numVertices; j++) {
             if (i != j) {
-                double dx = coordenadas[i].first - coordenadas[j].first;
-                double dy = coordenadas[i].second - coordenadas[j].second;
-                double dist = sqrt(dx * dx + dy * dy);
-                matrizAdyacencia[i][j] = dist;
-                if (!esDirigido)
-                    matrizAdyacencia[j][i] = dist;
+                dx = coordenadas[i].first - coordenadas[j].first;
+                dy = coordenadas[i].second - coordenadas[j].second;
+
+                distancia = sqrt(dx * dx + dy * dy);
+                matrizAdyacencia[i][j] = distancia;
+
+                if (!esDirigido) {
+                    matrizAdyacencia[j][i] = distancia;
+                }
             }
         }
     }
 }
 
-void Grafo::mostrarMatriz() const {
+// Mostrar matriz de adyacencia.
+void Grafo::mostrarMatriz() {
     if (esDirigido) {
-    cout << "Grafo Dirigido" << endl;
+        cout << "Grafo Dirigido" << endl;
     } else {
-    cout << "Grafo No Dirigido" << endl;
+        cout << "Grafo No Dirigido" << endl;
     }
-    cout << "Matriz de Adyacencia (distancias):" << endl;
+    cout << " - Matriz de Adyacencia (distancias):" << endl;
 
-    // Mostrar encabezado de columnas
+    // Mostrar encabezado de columnas.
     cout << "\t";
     for (int j = 0; j < numVertices; j++) {
         cout << "(" << coordenadas[j].first << ", " << coordenadas[j].second << ")\t";
     }
     cout << endl;
 
-    // Mostrar filas con coordenadas
+    // Mostrar filas con coordenadas.
     for (int i = 0; i < numVertices; i++) {
         cout << "(" << coordenadas[i].first << ", " << coordenadas[i].second << ")\t";
         for (int j = 0; j < numVertices; j++) {
