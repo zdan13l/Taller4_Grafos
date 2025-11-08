@@ -24,34 +24,38 @@ void Grafo::agregarVertice(int x, int y) {
     vertices.push_back(v);
     cout << "[DEBUG] Vertice agregado: ID=" << id << ", x=" << x << ", y=" << y << endl;
 
-    // Agregar nueva fila a la matriz
-    vector<double> nuevaFila(vertices.size(), 0.0);
-    matrizAdyacencia.push_back(nuevaFila);
+    int n = vertices.size();
 
-    // Calcular distancias con todos los anteriores
-    for (vector<Vertice>::iterator it = vertices.begin(); it != vertices.end(); ++it) {
-        int i = it->getId();
-        int j = id;
-        if (i != j) {
-            double d = calcularDistancia(*it, v);
-            matrizAdyacencia[i][j] = d;
-            matrizAdyacencia[j][i] = d;
-            cout << "[DEBUG] Distancia entre " << i << " y " << j << " = " << d << endl;
-        }
+    // 🔒 Asegurar que TODAS las filas tengan tamaño n
+    for (auto &fila : matrizAdyacencia) {
+        fila.resize(n, 0.0);
+    }
+
+    // 🔒 Agregar una nueva fila completamente inicializada
+    matrizAdyacencia.push_back(vector<double>(n, 0.0));
+
+    // ✅ Calcular distancias con todos los anteriores (ahora sin overflow)
+    for (int i = 0; i < n - 1; ++i) {
+        double d = calcularDistancia(vertices[i], v);
+        matrizAdyacencia[i][id] = d;
+        matrizAdyacencia[id][i] = d;
+        cout << "[DEBUG] Distancia entre " << i << " y " << id << " = " << d << endl;
     }
 }
 
 // Agregar el origen siempre al inicio
 void Grafo::agregarOrigen() {
-    Vertice origen(0, 0, 0); // id=0, x=0, y=0
+    // 1️⃣ Insertar origen al inicio
+    Vertice origen(0, 0, 0);
     vertices.insert(vertices.begin(), origen);
     cout << "[DEBUG] Origen agregado al inicio." << endl;
 
-    // Crear nueva matriz de adyacencia
     int n = vertices.size();
+
+    // 2️⃣ Crear nueva matriz de tamaño correcto
     vector<vector<double>> nuevaMatriz(n, vector<double>(n, 0.0));
 
-    // Copiar distancias existentes y calcular las nuevas
+    // 3️⃣ Calcular distancias entre el origen y los demás
     for (int i = 1; i < n; ++i) {
         double d = calcularDistancia(vertices[0], vertices[i]);
         nuevaMatriz[0][i] = d;
@@ -59,20 +63,27 @@ void Grafo::agregarOrigen() {
         cout << "[DEBUG] Distancia del origen a " << i << " = " << d << endl;
     }
 
-    // Copiar distancias antiguas a la nueva matriz (desplazadas 1)
-    for (int i = 1; i < n; ++i) {
-        for (int j = 1; j < n; ++j) {
-            nuevaMatriz[i][j] = matrizAdyacencia[i-1][j-1];
+    // 4️⃣ Copiar las distancias antiguas (si existían)
+    if (!matrizAdyacencia.empty()) {
+        int oldN = matrizAdyacencia.size();
+        for (int i = 1; i <= oldN; ++i) {
+            for (int j = 1; j <= oldN; ++j) {
+                // Evitar acceso fuera de rango si hay desfase
+                if (i - 1 < oldN && j - 1 < oldN)
+                    nuevaMatriz[i][j] = matrizAdyacencia[i - 1][j - 1];
+            }
         }
     }
 
     matrizAdyacencia = nuevaMatriz;
 
-    // Reasignar IDs a los vértices
+    // 5️⃣ Reasignar IDs coherentes
     for (int i = 0; i < n; ++i) {
         vertices[i] = Vertice(i, vertices[i].getX(), vertices[i].getY());
         cout << "[DEBUG] ID reasignado: nuevo ID=" << i << endl;
     }
+
+    cout << "[DEBUG] Origen agregado al grafo correctamente." << endl;
 }
 
 int Grafo::getCantidadVertices() const {
