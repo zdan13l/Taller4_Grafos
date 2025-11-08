@@ -1,24 +1,38 @@
-#include "Grafo.h"
-#include "Sistema.h"
+#include "Bodega.h"
+
+#include <iostream>
+
+using namespace std;
 
 int main() {
-    cout << endl;
-    cout << "       ˙✦˙✦˙✦˙✦   TALLER 4  ˙✦˙✦˙✦˙✦" << endl;
-    cout << "        Joselito recolector de basura" << endl;
-    cout << "      ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦" << endl;
+    char opcion;
 
-    Sistema sistema;
-    string nombreArchivo;
+    do {
+        cout << endl;
+        cout << "     ˙✦˙✦˙✦˙✦˙✦˙✦  TALLER 4  ✦˙✦˙✦˙✦˙✦˙" << endl;
+        cout << "        Joselito recolector de basura" << endl;
+        cout << "     ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙" << endl;
 
-    cout << endl << "~~~~~~ Sistema de recolección con Grafs ~~~~~~   " << endl;
-    cout << "Ingrese el nombre del archivo a cargar: ";
-    cin >> nombreArchivo;
+        string nombreArchivo;
+        cout << "\n~~~~~~ Sistema de recolección con Grafos ~~~~~~" << endl;
+        cout << " - Ingrese el nombre del archivo a cargar: ";
+        cin >> nombreArchivo;
 
-    if (sistema.cargarArchivo(nombreArchivo)) {
-        sistema.mostrarResumen();
-    } else {
-        cout << "No se pudo cargar el archivo. Verifique el nombre o formato." << endl;
-    }
+        Bodega bodega;
+        bodega.cargarArchivo(nombreArchivo);
 
+        do {
+            cout << "\n - ¿Desea procesar otro archivo? (S/N): ";
+            cin >> opcion;
+
+            if (opcion != 'S' && opcion != 's' && opcion != 'N' && opcion != 'n') {
+                cout << "   [ERROR]: Opción no válida. Ingrese S o N." << endl;
+            }
+
+        } while (opcion != 'S' && opcion != 's' && opcion != 'N' && opcion != 'n');
+
+    } while (opcion == 'S' || opcion == 's');
+
+    cout << "\nPrograma finalizado." << endl;
     return 0;
 }

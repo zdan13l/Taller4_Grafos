@@ -1,37 +1,36 @@
 #ifndef GRAFO_H
 #define GRAFO_H
 
+#include "Vertice.h"
+
 #include <iostream>
 #include <vector>
-#include <queue>
 #include <cmath>
+#include <cstdlib>
+#include <iomanip>
+
 using namespace std;
 
-/**
- * Clase Grafo
- * Representa un grafo dirigido o no dirigido mediante una matriz de adyacencia.
- * Soporta recorridos BFS y DFS.
- */
+// Clase Grafo que maneja vértices y matriz de adyacencia.
 class Grafo {
-private:
-    int numVertices;                      // Número de vértices
-    bool esDirigido;                      // True = dirigido, False = no dirigido
-    vector<vector<double>> matrizAdyacencia; // Matriz NxN
-    void DFSRecursivo(int v, vector<bool>& visitado); // Auxiliar para DFS
+    private:
+        // Atributos del grafo y su matriz de adyacencia.
+        vector<Vertice> vertices;
+        vector<vector<double>> matrizAdyacencia;
+        double calcularDistancia(Vertice& a, Vertice& b);
 
-public:
-    // Constructor
-    Grafo(int numVertices, bool esDirigido);
-
-    // Métodos básicos
-    vector<pair<double, double>> coordenadas; // (x,y) de cada vértice
-    void agregarArista(double x, double y);
-    void calcularMatrizDistancias(); //Genera todas las aristas (Grafo completo)
-    void mostrarMatriz() const;
-
-    // Recorridos
-    void BFS(int verticeInicio) const;
-    void DFS(int verticeInicio) const;
+    public:
+        // Métodos del grafo.
+        Grafo();
+        void agregarOrigen();
+        void agregarVertice(int x, int y);
+        void imprimirMatriz();
+        
+        // Obtener matriz de adyacencia y vértice por índice.
+        vector<vector<double>>& getMatrizAdyacencia();
+        Vertice& getVertice(int indice);
+        int getCantidadVertices();
+        
 };
 
 #endif
