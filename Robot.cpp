@@ -1,76 +1,81 @@
 #include "Robot.h"
-#include <iostream> // Asegúrate de incluir esto para los cout
 
-Robot::Robot(int capacidad, const Grafo& grafo)
-    : capacidadMaxima(capacidad), grafo(grafo), visitado(grafo.getCantidadVertices(), false) {
-    std::cout << "[DEBUG] Robot creado con capacidad: " << capacidadMaxima
-              << " y " << grafo.getCantidadVertices() << " vértices en el grafo." << std::endl;
+#include <iostream>
+
+using namespace std;
+
+// Constructor del robot.
+Robot::Robot(int capacidad, Grafo& grafo): capacidadMaxima(capacidad), grafo(grafo), visitado(grafo.getCantidadVertices(), false) {
+    cout << "[DEBUG] Robot creado con capacidad: " << capacidadMaxima << " y " << grafo.getCantidadVertices() << " vértices en el grafo." << endl;
 }
 
-// Recorrido basado en matriz de adyacencia y capacidad
+// Recorrido basado en matriz de adyacencia y capacidad.
 void Robot::recorrer() {
-    std::cout << "[DEBUG] Iniciando recorrido..." << std::endl;
+    cout << "[DEBUG] Iniciando recorrido..." << endl;
+    // Reiniciar estado.
     recorrido.clear();
     int verticesTotales = grafo.getCantidadVertices();
-    int actual = 0; // empieza en el origen
-    int carga = 0;
+    int actual = 0, carga = 0;
+    recorrido.push_back(actual);
+    cout << "[DEBUG] Partiendo del origen (vértice 0)." << endl;
 
-    recorrido.push_back(actual); // origen
-    std::cout << "[DEBUG] Partiendo del origen (vértice 0)." << std::endl;
-
+    // Recorrer hasta visitar todos los vértices.
     while (true) {
         int siguiente = -1;
-        double minDist = -1;
+        double minDistancia = -1;
 
-        const std::vector<std::vector<double>>& matriz = grafo.getMatrizAdyacencia();
+        vector<vector<double>>& matriz = grafo.getMatrizAdyacencia();
 
-        for (int i = 1; i < verticesTotales; ++i) {
+        // Buscar el siguiente vértice no visitado más cercano.
+        for (int i = 1; i < verticesTotales; i++) {
             if (!visitado[i]) {
-                double d = matriz[actual][i];
-                std::cout << "[DEBUG] Distancia desde " << actual << " a " << i << ": " << d << std::endl;
-                if (siguiente == -1 || d < minDist) {
-                    minDist = d;
+                double distancia = matriz[actual][i];
+                cout << "[DEBUG] Distancia desde " << actual << " a " << i << ": " << distancia << endl;
+                if (siguiente == -1 || distancia < minDistancia) {
+                    minDistancia = distancia;
                     siguiente = i;
                 }
             }
         }
 
+        // Si no hay más vértices por visitar, terminar.
         if (siguiente == -1) {
-            std::cout << "[DEBUG] Todos los vértices han sido visitados." << std::endl;
+            cout << "[DEBUG] Todos los vértices han sido visitados." << endl;
             break;
         }
 
-        std::cout << "[DEBUG] Visitando vértice " << siguiente << " desde " << actual << std::endl;
+        // Mover al siguiente vértice.
+        cout << "[DEBUG] Visitando vértice " << siguiente << " desde " << actual << endl;
         recorrido.push_back(siguiente);
         visitado[siguiente] = true;
-        carga++;
         actual = siguiente;
+        carga++;
 
+        // Si se alcanza la capacidad máxima, regresar al origen.
         if (carga == capacidadMaxima) {
-            std::cout << "[DEBUG] Capacidad máxima alcanzada. Regresando al origen." << std::endl;
+            cout << "[DEBUG] Capacidad máxima alcanzada. Regresando al origen." << endl;
             recorrido.push_back(0);
             actual = 0;
             carga = 0;
         }
     }
 
+    // Regresar al origen si no se está allí.
     if (actual != 0) {
-        std::cout << "[DEBUG] Recorrido finalizado fuera del origen. Regresando al origen." << std::endl;
+        cout << "[DEBUG] Recorrido finalizado fuera del origen. Regresando al origen." << endl;
         recorrido.push_back(0);
     }
 
-    std::cout << "[DEBUG] Recorrido completo: ";
+    cout << "[DEBUG] Recorrido completo: ";
+    // Imprimir recorrido.
     for (int id : recorrido) {
-        std::cout << id << " ";
+        cout << id << " ";
     }
-    std::cout << std::endl;
+    cout << endl;
 }
 
-// Getter del recorrido
-const std::vector<int>& Robot::getRecorrido() const {
-    return recorrido;
-}
+// Getter del recorrido.
+vector<int>& Robot::getRecorrido() { return recorrido; }
 
-int Robot::getCapacidad() const {
-    return capacidadMaxima;
-}
+// Getter de la capacidad.
+int Robot::getCapacidad() { return capacidadMaxima; }

@@ -1,5 +1,6 @@
-#include <iostream>
 #include "Bodega.h"
+
+#include <iostream>
 
 using namespace std;
 
@@ -9,17 +10,19 @@ int main() {
     do {
         cout << endl;
         cout << "     ˙✦˙✦˙✦˙✦˙✦   TALLER 4  ✦˙✦˙✦˙✦˙✦˙" << endl;
-        cout << "         Joselito recolector de basura" << endl;
-        cout << "     ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙" << endl;
+        cout << "       Joselito recolector de basura" << endl;
+        cout << "     ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙" << endl;
 
         string nombreArchivo;
-        cout << endl << "~~~~~~ Sistema de recolección con Grafos ~~~~~~" << endl;
+        cout << endl;
+        cout << "~~~~~~ Sistema de recolección con Grafos ~~~~~~" << endl;
         cout << " - Ingrese el nombre del archivo a cargar: ";
         cin >> nombreArchivo;
 
         Bodega bodega;
         bodega.cargarArchivo(nombreArchivo);
 
+        cout << endl;
         cout << " - ¿Desea procesar otro archivo? (S/N): ";
         cin >> opcion;
 

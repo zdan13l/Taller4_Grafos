@@ -1,24 +1,27 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 
-#include <vector>
 #include "Grafo.h"
+
+#include <vector>
 
 using namespace std;
 
-// Clase Robot que maneja la lógica de recorrido.
+// Clase Robot que realiza el recorrido en el grafo.
 class Robot {
     private:
+        // Atributos del robot.
         Grafo grafo;
         vector<int> recorrido;
         vector<bool> visitado;
         int capacidadMaxima;
 
     public:
-        Robot(int capacidad, const Grafo& grafo);
-        const vector<int>& getRecorrido() const;
-        int getCapacidad() const;
+        // Métodos del robot.
+        Robot(int capacidad, Grafo& grafo);
         void recorrer();
+        vector<int>& getRecorrido();
+        int getCapacidad();
 
 };
 

@@ -1,15 +1,18 @@
 #ifndef BODEGA_H
 #define BODEGA_H
 
-#include <vector>
-#include <string>
 #include "Grafo.h"
 #include "Robot.h"
 
+#include <vector>
+#include <string>
+
 using namespace std;
 
+// Clase Bodega que maneja múltiples escenarios y robots.
 class Bodega {
     private:
+        // Listas de escenarios, robots y recorridos.
         vector<Grafo> escenarios;
         vector<Robot> robots;
         vector<vector<int>> recorridos;
@@ -17,15 +20,13 @@ class Bodega {
     public:
         Bodega();
 
-        void cargarArchivo(const string& nombreArchivo); // Leer, procesar y guardar
+        // Metodos para cargar archivo, guardar resultados, imprimir y mostrar tablero.
+        void cargarArchivo(const string& nombreArchivo);
+        void guardarResultados(const string& nombreArchivo);
         void imprimirRecorridos();
-        void mostrarTablero(int escenarioIndex) const;
-
-
-        // Getters necesarios si quieres usarlos
-        const vector<Grafo>& getEscenarios() const { return escenarios; }
-        const vector<Robot>& getRobots() const { return robots; }
-        const vector<vector<int>>& getRecorridos() const { return recorridos; }
+        void mostrarTablero(int escenarioIndex);
+        void simularMovimiento(int escenarioIndex);
+        
 };
 
 #endif

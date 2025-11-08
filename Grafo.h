@@ -1,32 +1,35 @@
 #ifndef GRAFO_H
 #define GRAFO_H
 
-#include <vector>
+#include "Vertice.h"
+
 #include <iostream>
+#include <vector>
 #include <cmath>
 #include <cstdlib>
-#include "Vertice.h"
 
 using namespace std;
 
-
+// Clase Grafo que maneja vértices y matriz de adyacencia.
 class Grafo {
-private:
-    vector<Vertice> vertices;
-    vector<vector<double>> matrizAdyacencia;
+    private:
+        // Atributos del grafo y su matriz de adyacencia.
+        vector<Vertice> vertices;
+        vector<vector<double>> matrizAdyacencia;
+        double calcularDistancia(Vertice& a, Vertice& b);
 
-    double calcularDistancia(const Vertice& a, const Vertice& b) const;
-
-public:
-    Grafo();
-
-    void agregarVertice(int x, int y);
-    void agregarOrigen(); // Agrega el vértice origen (0,0) al inicio
-    int getCantidadVertices() const;
-    const Vertice& getVertice(int indice) const;
-    const vector<vector<double>>& getMatrizAdyacencia() const;
-
-    void imprimirMatriz() const;
+    public:
+        // Métodos del grafo.
+        Grafo();
+        void agregarOrigen();
+        void agregarVertice(int x, int y);
+        void imprimirMatriz();
+        
+        // Obtener matriz de adyacencia y vértice por índice.
+        vector<vector<double>>& getMatrizAdyacencia();
+        Vertice& getVertice(int indice);
+        int getCantidadVertices();
+        
 };
 
 #endif

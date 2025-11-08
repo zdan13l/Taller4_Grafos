@@ -1,6 +1,6 @@
-1
-2
-9
+Cantidad de recorridos: 1
+Capacidad del robot: 2
+Cantidad de vértices: 9
 0 0
 1 1
 2 3

@@ -17,11 +17,14 @@ class Vertice {
         // Constructor
         Vertice(int id = 0, double x = 0.0, double y = 0.0, bool visitado = false);
 
+        // Mostrar información del vértice.
+        void mostrar();
+        
         // Getters.
-        int getId() const;
-        double getX() const;
-        double getY() const;
-        bool getVisitado() const;
+        int getId();
+        double getX();
+        double getY();
+        bool getVisitado();
 
         // Setters.
         void setId(int id);
@@ -29,8 +32,6 @@ class Vertice {
         void setY(double y);
         void setVisitado(bool estado);
 
-        // Mostrar información del vértice.
-        void mostrar();
 };
 
 #endif
