@@ -1,0 +1,27 @@
+Cantidad de recorridos: 2
+Capacidad del robot: 3
+Cantidad de vértices: 12
+0 0
+2 2
+4 4
+1 5
+0 0
+7 1
+8 3
+9 6
+0 0
+3 8
+6 7
+0 0
+Capacidad del robot: 2
+Cantidad de vértices: 10
+0 0
+2 2
+4 4
+0 0
+1 5
+6 7
+0 0
+7 1
+8 3
+0 0

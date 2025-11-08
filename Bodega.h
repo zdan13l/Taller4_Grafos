@@ -24,8 +24,7 @@ class Bodega {
         void cargarArchivo(const string& nombreArchivo);
         void guardarResultados(const string& nombreArchivo);
         void imprimirRecorridos();
-        void mostrarTablero(int escenarioIndex);
-        void simularMovimiento(int escenarioIndex);
+        void simularMovimiento(int indiceEscenario);
         
 };
 

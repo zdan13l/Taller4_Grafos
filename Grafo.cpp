@@ -28,7 +28,6 @@ void Grafo::agregarOrigen() {
     // Insertar origen al inicio.
     Vertice origen(0, 0, 0);
     vertices.insert(vertices.begin(), origen);
-    cout << "[DEBUG] Origen agregado: ID=0, x=0, y=0" << endl;
     int n = vertices.size();
 
     // Crear nueva matriz de tamaño correcto.
@@ -39,7 +38,6 @@ void Grafo::agregarOrigen() {
         double distancia = calcularDistancia(vertices[0], vertices[i]);
         nuevaMatriz[0][i] = distancia;
         nuevaMatriz[i][0] = distancia;
-        cout << "[DEBUG] Distancia entre 0 y " << i << " = " << distancia << endl;
     }
 
     // Copiar las distancias antiguas (si existían).
@@ -60,7 +58,6 @@ void Grafo::agregarOrigen() {
     // Reasignar IDs.
     for (int i = 0; i < n; i++) {
         vertices[i] = Vertice(i, vertices[i].getX(), vertices[i].getY());
-        cout << "[DEBUG] Vertice reasignado: ID=" << i << ", x=" << vertices[i].getX() << ", y=" << vertices[i].getY() << endl;
     }
 }
 
@@ -69,7 +66,6 @@ void Grafo::agregarVertice(int x, int y) {
     int id = vertices.size();
     Vertice vertice (id, x, y);
     vertices.push_back(vertice  );
-    cout << "[DEBUG] Vertice agregado: ID=" << id << ", x=" << x << ", y=" << y << endl;
 
     int n = vertices.size();
 
@@ -87,24 +83,47 @@ void Grafo::agregarVertice(int x, int y) {
         double distancia = calcularDistancia(vertices[i], vertice);
         matrizAdyacencia[i][id] = distancia;
         matrizAdyacencia[id][i] = distancia;
-        cout << "[DEBUG] Distancia entre " << i << " y " << id << " = " << distancia << endl;
     }
 }
 
 // Imprimir matriz de adyacencia.
 void Grafo::imprimirMatriz() {
-    // Iteradores para recorrer la matriz.
-    vector<vector<double>>::const_iterator itFila;
-    vector<double>::const_iterator itCol;
+    cout << "\n============== MATRIZ DE ADYACENCIA ==============" << endl;
 
-    // Recorrer e imprimir.
-    for (itFila = matrizAdyacencia.begin(); itFila != matrizAdyacencia.end(); itFila++) {
-        for (itCol = itFila->begin(); itCol != itFila->end(); itCol++) {
-            cout << *itCol << "\t";
+    int n = matrizAdyacencia.size();
+    if (n == 0) {
+        cout << "[INFO] La matriz está vacía." << endl;
+        return;
+    }
+
+    // Encabezado de columnas
+    cout << setw(6) << " "; // espacio inicial
+    for (int j = 0; j < n; j++) {
+        cout << setw(6) << ("V" + to_string(j));
+    }
+    cout << endl;
+
+    // Separador visual
+    cout << "     ";
+    for (int j = 0; j < n; j++) cout << "------";
+    cout << endl;
+
+    // Filas de la matriz
+    for (int i = 0; i < n; i++) {
+        cout << setw(4) << ("V" + to_string(i)) << " |"; // etiqueta de fila
+        for (int j = 0; j < n; j++) {
+            double valor = matrizAdyacencia[i][j];
+            if (valor == 0)
+                cout << setw(6) << "-";
+            else
+                cout << setw(6) << fixed << setprecision(1) << valor;
         }
         cout << endl;
     }
+
+    cout << "=================================================\n" << endl;
 }
+
 
 // Obtener matriz de adyacencia.
 vector<vector<double>>& Grafo::getMatrizAdyacencia() { return matrizAdyacencia; }

@@ -11,26 +11,20 @@ class Vertice {
         int id;
         double x;
         double y;
-        bool visitado;
 
     public:
         // Constructor
-        Vertice(int id = 0, double x = 0.0, double y = 0.0, bool visitado = false);
+        Vertice(int id = 0, double x = 0.0, double y = 0.0);
 
-        // Mostrar información del vértice.
-        void mostrar();
-        
         // Getters.
         int getId();
         double getX();
         double getY();
-        bool getVisitado();
 
         // Setters.
         void setId(int id);
         void setX(double x);
         void setY(double y);
-        void setVisitado(bool estado);
 
 };
 

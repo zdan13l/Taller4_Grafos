@@ -3,7 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <thread>
 #include <chrono>
 #include <cstdlib>
 
@@ -11,7 +10,6 @@ using namespace std;
 
 // Constructor.
 Bodega::Bodega() {
-    cout << "[DEBUG] Constructor Bodega iniciado." << endl;
     escenarios.clear();
     robots.clear();
     recorridos.clear();
@@ -19,7 +17,6 @@ Bodega::Bodega() {
 
 // Cargar archivo, procesar y guardar resultados.
 void Bodega::cargarArchivo(const string& nombreArchivo) {
-    cout << "[DEBUG] Intentando abrir archivo: " << nombreArchivo << endl;
     // Abrir archivo de entrada.
     ifstream archivo(nombreArchivo);
     if (!archivo.is_open()) {
@@ -28,14 +25,17 @@ void Bodega::cargarArchivo(const string& nombreArchivo) {
     }
 
     // Limpiar datos previos.
-    escenarios.clear();
-    robots.clear();
-    recorridos.clear();
+    Bodega();
 
     // Leer número de escenarios.
     int nEscenarios;
     archivo >> nEscenarios;
-    cout << "[DEBUG] Número de escenarios: " << nEscenarios << endl;
+
+    // después de leer nEscenarios se le asigna un tamaño a cada vector para evitar el debordamiento
+    escenarios.reserve(nEscenarios);
+    robots.reserve(nEscenarios);
+    recorridos.reserve(nEscenarios);
+
 
     // Procesar cada escenario.
     for (int escenario = 0; escenario < nEscenarios; escenario++) {
@@ -44,12 +44,9 @@ void Bodega::cargarArchivo(const string& nombreArchivo) {
             cout << " [ERROR] Formato incorrecto en archivo." << endl;
             return;
         }
-        cout << "[DEBUG] Escenario " << escenario << ": capacidad=" << capacidad << ", cantidad de vértices=" << productos << endl;
-
         // Declarar grafo y vértice de origen.
         Grafo grafo;
         grafo.agregarOrigen();
-        cout << "[DEBUG] Origen agregado al grafo." << endl;
 
         // Leer y agregar vértices al grafo.
         for (int i = 0; i < productos; i++) {
@@ -59,26 +56,40 @@ void Bodega::cargarArchivo(const string& nombreArchivo) {
                 return;
             }
             grafo.agregarVertice(x, y);
-            cout << "[DEBUG] Vértice agregado: (" << x << ", " << y << ")" << endl;
         }
 
         // Almacenar grafo y crear robot.
         escenarios.push_back(grafo);
-        robots.emplace_back(capacidad, escenarios.back());
-        cout << "[DEBUG] Robot creado con capacidad " << capacidad << endl;
+        robots.emplace_back(capacidad, &escenarios.back());
     }
     archivo.close();
-    cout << "[DEBUG] Archivo cerrado." << endl;
-
+    bool verEscenarios;
+    char respuesta = 's';
+    bool respuestaValida;
+    do{
+        cout << "¿Desea ver el paso a paso de manera grafica? (S/N):";
+        cin >> respuesta;
+        if(respuesta == 'S' || respuesta == 's'){
+            verEscenarios = true;
+            respuestaValida = true;
+        }else if(respuesta == 'N' || respuesta == 'n'){
+            verEscenarios = false;
+            respuestaValida = true;
+        }else{
+            cout << "[ERROR]:Respuesta no valida";
+        }
+    }while(!respuestaValida);
+    cout<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" <<endl;
     // Procesar recorridos para cada robot.
     for (int i = 0; i < escenarios.size(); i++) {
-        cout << "[DEBUG] Procesando recorrido para escenario " << i << endl;
+        escenarios[i].imprimirMatriz();
+        cout << "Recorrido calculado por el robot para el escenario " << i+1 <<endl;
         robots[i].recorrer();
         recorridos.push_back(robots[i].getRecorrido());
-        cout << "[DEBUG] Recorrido completado. Tamaño: " << recorridos[i].size() << endl;
-
-        // Mostrar tablero con emojis.
-        simularMovimiento(i);
+        if(verEscenarios){
+            // Mostrar tablero con emojis.
+            simularMovimiento(i);
+        }
     }
 
     // Imprimir recorridos en consola.
@@ -98,7 +109,7 @@ void Bodega::guardarResultados(const string& nombreArchivo) {
         return;
     }
 
-    cout << "[DEBUG] Guardando archivo de salida: " << nombreSalida << endl;
+    cout << "Guardando en archivo de salida: " << nombreSalida << endl;
     archivoSalida << "Cantidad de recorridos: " << recorridos.size() << endl;
 
     // Guardar cada recorrido.
@@ -111,7 +122,7 @@ void Bodega::guardarResultados(const string& nombreArchivo) {
             int id = recorridos[i][j];
             Vertice& vertice = escenarios[i].getVertice(id);
             archivoSalida << vertice.getX() << " " << vertice.getY() << endl;
-            cout << "[DEBUG] Guardando vértice: (" << vertice.getX() << ", " << vertice.getY() << ")" << endl;
+            
         }
     }
     archivoSalida.close();
@@ -123,7 +134,8 @@ void Bodega::guardarResultados(const string& nombreArchivo) {
 
 // Imprime los recorridos en consola.
 void Bodega::imprimirRecorridos() {
-    cout << "[DEBUG] Imprimiendo recorridos..." << endl;
+    cout << endl << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+    cout << "Imprimiendo recorridos finales" << endl;
     for (int i = 0; i < recorridos.size(); i++) {
         cout << "Escenario " << i + 1 << ": ";
 
@@ -137,66 +149,15 @@ void Bodega::imprimirRecorridos() {
     }
 }
 
-// Mostrar tablero con emojis.
-void Bodega::mostrarTablero(int escenarioIndex) {
-    cout << "[DEBUG] Mostrando tablero para escenario " << escenarioIndex << endl;
-    // Validar índice.
-    if (escenarioIndex < 0 || escenarioIndex >= (int) escenarios.size()) {
-        cout << "[ERROR] Escenario inválido." << endl;
-        return;
-    }
-
-    // Obtener grafo y recorrido.
-    Grafo& grafo = escenarios[escenarioIndex];
-    vector<int>& recorrido = robots[escenarioIndex].getRecorrido();
-
-    // Emojis.
-    string robotEmoji = "\xF0\x9F\xA4\x96"; // 🤖
-    string cajaEmoji  = "\xF0\x9F\x93\xA6"; // 📦
-
-    // Parámetros del tablero.
-    int escala = 2;
-    int tamTablero = 100 / escala + 1;
-    vector<vector<string>> tablero(tamTablero, vector<string>(tamTablero, "·"));
-
-    // Colocar cajas.
-    for (int i = 1; i < grafo.getCantidadVertices(); i++) {
-        int ejeX = grafo.getVertice(i).getX() / escala;
-        int ejeY = grafo.getVertice(i).getY() / escala;
-        ejeX = min(ejeX, tamTablero - 1);
-        ejeY = min(ejeY, tamTablero - 1);
-        tablero[ejeY][ejeX] = cajaEmoji;
-        cout << "[DEBUG] Caja colocada en: (" << ejeX << ", " << ejeY << ")" << endl;
-    }
-
-    // Colocar robot.
-    int idRobot = recorrido.back();
-    int x = grafo.getVertice(idRobot).getX() / escala;
-    int y = grafo.getVertice(idRobot).getY() / escala;
-    x = min(x, tamTablero - 1);
-    y = min(y, tamTablero - 1);
-    tablero[y][x] = robotEmoji;
-    cout << "[DEBUG] Robot colocado en: (" << x << ", " << y << ")" << endl;
-
-    // Imprimir tablero.
-    cout << "[DEBUG] Tablero generado:" << endl;
-    for (int y = tamTablero - 1; y >= 0; y--) {
-        for (int x = 0; x < tamTablero; x++) {
-            cout << tablero[y][x] << " ";
-        }
-        cout << endl;
-    }
-}
-
 // Simular movimiento del robot en el tablero.
-void Bodega::simularMovimiento(int escenarioIndex) {
-    if (escenarioIndex < 0 || escenarioIndex >= (int)escenarios.size()) {
+void Bodega::simularMovimiento(int indiceEscenario) {
+    if (indiceEscenario < 0 || indiceEscenario >= (int)escenarios.size()) {
         cout << "[ERROR] Escenario inválido." << endl;
         return;
     }
 
-    Grafo& grafo = escenarios[escenarioIndex];
-    vector<int>& recorrido = robots[escenarioIndex].getRecorrido();
+    Grafo& grafo = escenarios[indiceEscenario];
+    vector<int>& recorrido = robots[indiceEscenario].getRecorrido();
 
     // Emojis
     string robotEmoji = "\xF0\x9F\xA4\x96"; // 🤖
@@ -240,7 +201,7 @@ void Bodega::simularMovimiento(int escenarioIndex) {
         }
 
         // Mostrar el tablero actual
-        cout << "=== ESCENARIO " << escenarioIndex + 1 << " | PASO " << paso + 1 << "/" << recorrido.size() << " ===" << endl;
+        cout << "=== ESCENARIO " << indiceEscenario + 1 << " | PASO " << paso + 1 << "/" << recorrido.size() << " ===" << endl;
 
         for (int fila = tamTablero - 1; fila >= 0; fila--) {
             for (int col = 0; col < tamTablero; col++) {
@@ -253,11 +214,6 @@ void Bodega::simularMovimiento(int escenarioIndex) {
             cout << endl;
         }
 
-        // Pausa entre pasos (más visible para observar cambios)
-        this_thread::sleep_for(chrono::milliseconds(800));
-
         cout << endl;
     }
-
-    cout << "[DEBUG] Simulación completada para escenario " << escenarioIndex << endl;
 }

@@ -9,24 +9,30 @@ int main() {
 
     do {
         cout << endl;
-        cout << "     ˙✦˙✦˙✦˙✦˙✦   TALLER 4  ✦˙✦˙✦˙✦˙✦˙" << endl;
-        cout << "       Joselito recolector de basura" << endl;
+        cout << "     ˙✦˙✦˙✦˙✦˙✦˙✦  TALLER 4  ✦˙✦˙✦˙✦˙✦˙" << endl;
+        cout << "        Joselito recolector de basura" << endl;
         cout << "     ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙" << endl;
 
         string nombreArchivo;
-        cout << endl;
-        cout << "~~~~~~ Sistema de recolección con Grafos ~~~~~~" << endl;
+        cout << "\n~~~~~~ Sistema de recolección con Grafos ~~~~~~" << endl;
         cout << " - Ingrese el nombre del archivo a cargar: ";
         cin >> nombreArchivo;
 
         Bodega bodega;
         bodega.cargarArchivo(nombreArchivo);
 
-        cout << endl;
-        cout << " - ¿Desea procesar otro archivo? (S/N): ";
-        cin >> opcion;
+        do {
+            cout << "\n - ¿Desea procesar otro archivo? (S/N): ";
+            cin >> opcion;
 
-    } while (opcion == 's' || opcion == 'S');
+            if (opcion != 'S' && opcion != 's' && opcion != 'N' && opcion != 'n') {
+                cout << "   [ERROR]: Opción no válida. Ingrese S o N." << endl;
+            }
 
+        } while (opcion != 'S' && opcion != 's' && opcion != 'N' && opcion != 'n');
+
+    } while (opcion == 'S' || opcion == 's');
+
+    cout << "\nPrograma finalizado." << endl;
     return 0;
 }
