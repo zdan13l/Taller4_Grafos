@@ -5,8 +5,8 @@ using namespace std;
 // Constructor del robot.
 Robot::Robot(int capacidad, Grafo* grafo)
     : capacidadMaxima(capacidad),
-      grafo(grafo),
-      visitado(grafo->getCantidadVertices(), false) {
+    grafo(grafo),
+    visitado(grafo->getCantidadVertices(), false) {
 }
 
 // Recorrido basado en matriz de adyacencia y capacidad.

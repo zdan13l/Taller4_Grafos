@@ -4,6 +4,7 @@
 
 using namespace std;
 
+// Programa principal.
 int main() {
     char opcion;
 
@@ -14,7 +15,8 @@ int main() {
         cout << "     ˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙✦˙" << endl;
 
         string nombreArchivo;
-        cout << "\n~~~~~~ Sistema de recolección con Grafos ~~~~~~" << endl;
+        cout << endl;
+        cout << "~~~~~~ Sistema de recolección con Grafos ~~~~~~" << endl;
         cout << " - Ingrese el nombre del archivo a cargar: ";
         cin >> nombreArchivo;
 
@@ -22,17 +24,17 @@ int main() {
         bodega.cargarArchivo(nombreArchivo);
 
         do {
-            cout << "\n - ¿Desea procesar otro archivo? (S/N): ";
+            cout << endl;
+            cout << " - ¿Desea procesar otro archivo? (S/N): ";
             cin >> opcion;
 
             if (opcion != 'S' && opcion != 's' && opcion != 'N' && opcion != 'n') {
-                cout << "   [ERROR]: Opción no válida. Ingrese S o N." << endl;
+                cout << "[ERROR] Opción inválida, ingrese S o N." << endl;
             }
-
         } while (opcion != 'S' && opcion != 's' && opcion != 'N' && opcion != 'n');
-
     } while (opcion == 'S' || opcion == 's');
 
-    cout << "\nPrograma finalizado." << endl;
+    cout << endl;
+    cout << " - Sistema de recolección finalizado." << endl;
     return 0;
 }

@@ -3,8 +3,6 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <chrono>
-#include <cstdlib>
 
 using namespace std;
 
@@ -20,7 +18,7 @@ void Bodega::cargarArchivo(const string& nombreArchivo) {
     // Abrir archivo de entrada.
     ifstream archivo(nombreArchivo);
     if (!archivo.is_open()) {
-        cout << " [ERROR] No se pudo abrir el archivo." << endl;
+        cout << "[ERROR] No se pudo abrir el archivo." << endl;
         return;
     }
 
@@ -31,19 +29,19 @@ void Bodega::cargarArchivo(const string& nombreArchivo) {
     int nEscenarios;
     archivo >> nEscenarios;
 
-    // después de leer nEscenarios se le asigna un tamaño a cada vector para evitar el debordamiento
+    // Reservar espacio en los vectores.
     escenarios.reserve(nEscenarios);
     robots.reserve(nEscenarios);
     recorridos.reserve(nEscenarios);
-
 
     // Procesar cada escenario.
     for (int escenario = 0; escenario < nEscenarios; escenario++) {
         int capacidad, productos;
         if (!(archivo >> capacidad >> productos)) {
-            cout << " [ERROR] Formato incorrecto en archivo." << endl;
+            cout << "[ERROR] Formato incorrecto en archivo." << endl;
             return;
         }
+
         // Declarar grafo y vértice de origen.
         Grafo grafo;
         grafo.agregarOrigen();
@@ -63,30 +61,36 @@ void Bodega::cargarArchivo(const string& nombreArchivo) {
         robots.emplace_back(capacidad, &escenarios.back());
     }
     archivo.close();
+
+    // Preguntar si se desea ver los escenarios.
+    cout << endl;
+    cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
     bool verEscenarios;
     char respuesta = 's';
     bool respuestaValida;
-    do{
-        cout << "¿Desea ver el paso a paso de manera grafica? (S/N):";
+
+    do {
+        cout << " - ¿Desea ver el paso a paso de manera grafica? (S/N):";
         cin >> respuesta;
-        if(respuesta == 'S' || respuesta == 's'){
+        if (respuesta == 'S' || respuesta == 's') {
             verEscenarios = true;
             respuestaValida = true;
-        }else if(respuesta == 'N' || respuesta == 'n'){
+        } else if (respuesta == 'N' || respuesta == 'n') {
             verEscenarios = false;
             respuestaValida = true;
-        }else{
-            cout << "[ERROR]:Respuesta no valida";
+        } else {
+            cout << "[ERROR] Respuesta no válida." << endl;
         }
-    }while(!respuestaValida);
+    } while(!respuestaValida);
     cout<< "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" <<endl;
+
     // Procesar recorridos para cada robot.
     for (int i = 0; i < escenarios.size(); i++) {
         escenarios[i].imprimirMatriz();
         cout << "Recorrido calculado por el robot para el escenario " << i+1 <<endl;
         robots[i].recorrer();
         recorridos.push_back(robots[i].getRecorrido());
-        if(verEscenarios){
+        if(verEscenarios) {
             // Mostrar tablero con emojis.
             simularMovimiento(i);
         }
@@ -110,12 +114,12 @@ void Bodega::guardarResultados(const string& nombreArchivo) {
     }
 
     cout << "Guardando en archivo de salida: " << nombreSalida << endl;
-    archivoSalida << "Cantidad de recorridos: " << recorridos.size() << endl;
+    archivoSalida << recorridos.size() << endl;
 
     // Guardar cada recorrido.
     for (int i = 0; i < recorridos.size(); i++) {
-        archivoSalida << "Capacidad del robot: " << robots[i].getCapacidad() << endl;
-        archivoSalida << "Cantidad de vértices: " << recorridos[i].size() << endl;
+        archivoSalida << robots[i].getCapacidad() << endl;
+        archivoSalida << recorridos[i].size() << endl;
 
         // Guardar cada vértice del recorrido.
         for (int j = 0; j < recorridos[i].size(); j++) {
@@ -159,26 +163,26 @@ void Bodega::simularMovimiento(int indiceEscenario) {
     Grafo& grafo = escenarios[indiceEscenario];
     vector<int>& recorrido = robots[indiceEscenario].getRecorrido();
 
-    // Emojis
-    string robotEmoji = "\xF0\x9F\xA4\x96"; // 🤖
-    string cajaEmoji  = "\xF0\x9F\x93\xA6"; // 📦
-    string recogidaEmoji = "❌";            // Caja ya recogida
+    // Emojis.
+    string robotEmoji = "🤖";
+    string cajaEmoji  = "📦";
+    string recogidaEmoji = "❌";
 
-    // Calcular los límites máximos para escalar el tablero
+    // Calcular los límites máximos para escalar el tablero.
     int maxX = 0, maxY = 0;
     for (int i = 0; i < grafo.getCantidadVertices(); i++) {
         maxX = max(maxX, (int)grafo.getVertice(i).getX());
         maxY = max(maxY, (int)grafo.getVertice(i).getY());
     }
 
-    // Ajuste dinámico de escala
-    int escala = max(1, max(maxX, maxY) / 20); // tablero ~20x20
+    // Ajuste dinámico de escala.
+    int escala = max(1, max(maxX, maxY) / 20);
     int tamTablero = max(maxX, maxY) / escala + 2;
 
-    // Mantener registro de las cajas recogidas
+    // Mantener registro de las cajas recogidas.
     vector<vector<string>> tablero(tamTablero, vector<string>(tamTablero, "·"));
 
-    // Colocar inicialmente todas las cajas
+    // Colocar inicialmente todas las cajas.
     for (int i = 1; i < grafo.getCantidadVertices(); i++) {
         int ejeX = grafo.getVertice(i).getX() / escala;
         int ejeY = grafo.getVertice(i).getY() / escala;
@@ -187,7 +191,7 @@ void Bodega::simularMovimiento(int indiceEscenario) {
         tablero[ejeY][ejeX] = cajaEmoji;
     }
 
-    // Simulación paso a paso (sin limpiar la pantalla)
+    // Simulación paso a paso.
     for (int paso = 0; paso < recorrido.size(); paso++) {
         int idRobot = recorrido[paso];
         int x = grafo.getVertice(idRobot).getX() / escala;
@@ -195,17 +199,17 @@ void Bodega::simularMovimiento(int indiceEscenario) {
         x = min(x, tamTablero - 1);
         y = min(y, tamTablero - 1);
 
-        // Si no es el origen (id=0) y hay una caja, marcarla como recogida
+        // Si no es el origen y hay una caja, marcarla como recogida.
         if (idRobot != 0 && tablero[y][x] == cajaEmoji) {
             tablero[y][x] = recogidaEmoji;
         }
 
-        // Mostrar el tablero actual
+        // Mostrar el tablero actual.
         cout << "=== ESCENARIO " << indiceEscenario + 1 << " | PASO " << paso + 1 << "/" << recorrido.size() << " ===" << endl;
 
         for (int fila = tamTablero - 1; fila >= 0; fila--) {
             for (int col = 0; col < tamTablero; col++) {
-                // Dibujar el robot si está en esta celda
+                // Dibujar el robot si está en esta celda.
                 if (fila == y && col == x)
                     cout << robotEmoji << " ";
                 else

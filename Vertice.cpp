@@ -11,7 +11,6 @@ Vertice::Vertice(int id, double x, double y) {
     this->y = y;
 }
 
-
 // Getters.
 int Vertice::getId() { return id; }
 double Vertice::getX() { return x; }

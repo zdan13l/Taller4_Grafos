@@ -23,7 +23,7 @@ Grafo::Grafo() {
     matrizAdyacencia.clear();
 }
 
-// Agregar el origen siempre al inicio
+// Agregar el origen siempre al inicio.
 void Grafo::agregarOrigen() {
     // Insertar origen al inicio.
     Vertice origen(0, 0, 0);
@@ -88,7 +88,8 @@ void Grafo::agregarVertice(int x, int y) {
 
 // Imprimir matriz de adyacencia.
 void Grafo::imprimirMatriz() {
-    cout << "\n============== MATRIZ DE ADYACENCIA ==============" << endl;
+    cout << endl;
+    cout << "============== MATRIZ DE ADYACENCIA ==============" << endl;
 
     int n = matrizAdyacencia.size();
     if (n == 0) {
@@ -96,34 +97,33 @@ void Grafo::imprimirMatriz() {
         return;
     }
 
-    // Encabezado de columnas
-    cout << setw(6) << " "; // espacio inicial
+    // Encabezado de columnas.
+    cout << setw(6) << " ";
     for (int j = 0; j < n; j++) {
         cout << setw(6) << ("V" + to_string(j));
     }
     cout << endl;
 
-    // Separador visual
+    // Separador visual.
     cout << "     ";
     for (int j = 0; j < n; j++) cout << "------";
     cout << endl;
 
-    // Filas de la matriz
+    // Filas de la matriz.
     for (int i = 0; i < n; i++) {
-        cout << setw(4) << ("V" + to_string(i)) << " |"; // etiqueta de fila
+        cout << setw(4) << ("V" + to_string(i)) << " |";
         for (int j = 0; j < n; j++) {
             double valor = matrizAdyacencia[i][j];
-            if (valor == 0)
+            if (valor == 0) {
                 cout << setw(6) << "-";
-            else
+            } else {
                 cout << setw(6) << fixed << setprecision(1) << valor;
+            }
         }
         cout << endl;
     }
-
-    cout << "=================================================\n" << endl;
+    cout << "=================================================" << endl;
 }
-
 
 // Obtener matriz de adyacencia.
 vector<vector<double>>& Grafo::getMatrizAdyacencia() { return matrizAdyacencia; }

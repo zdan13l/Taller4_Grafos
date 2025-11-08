@@ -8,6 +8,7 @@ using namespace std;
 // Clase que representa un vértice en el grafo.
 class Vertice {
     private:
+        // Atributos del vértice.
         int id;
         double x;
         double y;
